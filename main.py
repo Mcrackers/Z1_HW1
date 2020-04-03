@@ -31,6 +31,7 @@ PS 2 Przed uruchomieniem testów, należy zrestartować swoją aplikację, żeby
 from fastapi import FastAPI
 from pydantic import BaseModel
 app = FastAPI()
+app.num = 0
 
 @app.get("/")
 def root():
@@ -57,17 +58,10 @@ def return_delete():
 	return {"method": "DELETE"}
 
 
-app.num = 0
-
-
+@app.get("/num")
 def num():
 	app.num += 1
 	return app.num
-
-
-@app.get("/number")
-def number():
-	return str(app.num)
 
 
 class Request(BaseModel):
@@ -83,6 +77,5 @@ class Respond(BaseModel):
 @app.post("/patient", response_model=Respond)
 def new_patient(data: Request):
 	return Respond(patient=data.dict())
-
 
 
