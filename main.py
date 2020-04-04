@@ -47,8 +47,9 @@ PS 3 Pamiętaj, aby liczyć pacjentów od 0!
 """
 
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 app = FastAPI()
 app.num = 0
 app.count = -1
@@ -94,5 +95,4 @@ def get_patient(pk: int):
 	if pk in range(len(patlist)):
 		return Request(name = patlist[pk]["name"], surename = patlist[pk]["surename"])
 	else:
-		raise HTTPException(status_code=204, detail="No Content")
-
+		return JSONResponse(status_code=204, content={})
