@@ -93,6 +93,6 @@ def new_patient(data: Request):
 @app.get("/patient/{pk}")
 def get_patient(pk: int):
 	if pk in range(len(patlist)):
-		return json.dumps(patlist[pk])
+		return json.JSONEncoder().encode(patlist[pk])
 	else:
 		raise HTTPException(status_code=204, detail="No Content")
