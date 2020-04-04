@@ -31,7 +31,9 @@ PS 2 Przed uruchomieniem testów, należy zrestartować swoją aplikację, żeby
 from fastapi import FastAPI
 from pydantic import BaseModel
 app = FastAPI()
-app.num = 0
+app.num = -1
+l1 = []
+
 
 @app.get("/")
 def root():
@@ -64,18 +66,24 @@ def num():
 	return app.num
 
 
+@app.get("/patient")
+def l_patients():
+	return {"lista": l1}
+
+
 class Request(BaseModel):
 	name: str
 	surename: str
 
 
 class Respond(BaseModel):
-	id = num()
+	id: int
 	patient: dict
 
 
 @app.post("/patient", response_model=Respond)
 def new_patient(data: Request):
-	return Respond(patient=data.dict())
-
-
+	if data:
+		l1.append(data.dict())
+		app.num +=1
+	return Respond(id = app.num, patient = data.dict())
