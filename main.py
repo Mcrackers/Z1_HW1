@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Cookie, Response, Depends
+from fastapi import FastAPI, Response, HTTPException
 from hashlib import sha256
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic
 
 
 app = FastAPI()
@@ -22,7 +22,6 @@ def root():
 	return {"message": "Hello World during the coronavirus pandemic!"}
 
 
-#@app.post("/welcome")
 @app.get("/welcome")
 def welcome_to_the_jungle():
 	return {"message": "welcome to the jungle! We have funny games!"}
@@ -38,12 +37,8 @@ def login_to_app(user: str, passw: str, response: Response):
 		print('logged in')
 		return response
 	else:
-		return "username or password is incorrect"
+		raise HTTPException(status_code=401)
 
-
-@app.get("/users/me")
-def read_current_user(credentials: HTTPBasicCredentials = Depends(security)):
-    return {"username": credentials.username, "password": credentials.password}
 
 @app.get("/num")
 def num():
