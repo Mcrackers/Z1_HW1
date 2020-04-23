@@ -22,7 +22,7 @@ def root():
 	return {"message": "Hello World during the coronavirus pandemic!"}
 
 
-@app.post("/welcome")
+#@app.post("/welcome")
 @app.get("/welcome")
 def welcome_to_the_jungle():
 	return {"message": "welcome to the jungle! We have funny games!"}
