@@ -45,7 +45,9 @@ def login_to_app(response: Response, credentials: HTTPBasicCredentials = Depends
 @app.post("/logout")
 def byebye(response: Response):
 	response.delete_cookie(key="session_token",path="/")
+	response.status_code = 307
 	RedirectResponse(url='/')
+	return response
 
 
 @app.get("/num")
