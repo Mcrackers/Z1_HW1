@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Response, HTTPException, Depends, Cookie
+from fastapi import FastAPI, Response, Request, HTTPException, Depends, Cookie
 from hashlib import sha256
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.templating import Jinja2Templates
 
 
 app = FastAPI()
@@ -14,6 +15,7 @@ app.secret = "secret"
 app.tokens = []
 patlist = []
 
+template =Jinja2Templates(directory="templates")
 
 @app.get("/")
 def root():
@@ -21,9 +23,9 @@ def root():
 
 
 @app.get("/welcome")
-def welcome_to_the_jungle(s_token = Cookie(None)):
+def welcome_to_the_jungle(request: Request, s_token = Cookie(None)):
 	if s_token in app.tokens:
-		return {"message": "Welcome to the jungle! We have funny games!"}
+		return template.TemplateResponse("template1.html", {"request": request, "user": "trudnY" })
 	else:
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
 
