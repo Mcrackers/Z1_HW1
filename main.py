@@ -31,6 +31,7 @@ def login_to_app(response: Response, credentials: HTTPBasicCredentials=Depends(H
 		app.tokens += s_token
 		response.set_cookie(key="session_token",value=s_token)
 		response.status_code = 307
+		response.headers['Location'] = "/welcome"
 		RedirectResponse(url='/welcome')
 	else:
 		raise HTTPException(status_code=401, detail="Niepoprawny login lub haslo")
