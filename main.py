@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Response, HTTPException
+from fastapi import FastAPI, Response, HTTPException, Depends
 from hashlib import sha256
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
-from fastapi.security import HTTPBasic
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 
 app = FastAPI()
@@ -14,30 +14,26 @@ app.secret = "secret"
 app.tokens = []
 patlist = []
 
-security = HTTPBasic()
-
 
 @app.get("/")
 def root():
 	return {"message": "Hello World during the coronavirus pandemic!"}
 
-
 @app.get("/welcome")
 def welcome_to_the_jungle():
-	return {"message": "welcome to the jungle! We have funny games!"}
+	return {"message": "Welcome to the jungle! We have funny games!"}
 
 
 @app.post("/login")
-def login_to_app(user: str, passw: str, response: Response):
-	if user in app.users and passw == app.users[user]:
-		s_token = sha256(bytes(f"{user}{passw}{app.secret}", encoding='utf8')).hexdigest()
+def login_to_app(response: Response, credentials: HTTPBasicCredentials=Depends(HTTPBasic())):
+	if credentials.username in app.users and credentials.password == app.users[credentials.username]:
+		s_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret}", encoding='utf8')).hexdigest()
 		app.tokens += s_token
 		response.set_cookie(key="session_token",value=s_token)
-		response = RedirectResponse(url='/welcome')
 		print('logged in')
-		return response
+		return RedirectResponse(url='/welcome')
 	else:
-		raise HTTPException(status_code=401)
+		raise HTTPException(status_code=401, detail="Niepoprawny login lub hasło")
 
 
 @app.get("/num")
