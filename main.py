@@ -30,10 +30,9 @@ def login_to_app(response: Response, credentials: HTTPBasicCredentials=Depends(H
 		s_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret}", encoding='utf8')).hexdigest()
 		app.tokens += s_token
 		response.set_cookie(key="session_token",value=s_token)
-		print('logged in')
-		return RedirectResponse(url='/welcome')
+		RedirectResponse(url='/welcome')
 	else:
-		raise HTTPException(status_code=401, detail="Niepoprawny login lub hasło")
+		raise HTTPException(status_code=401, detail="Niepoprawny login lub haslo")
 
 
 @app.get("/num")
