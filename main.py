@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, HTTPException, Depends
+from fastapi import FastAPI, Response, HTTPException, Depends, Cookie
 from hashlib import sha256
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
@@ -19,22 +19,33 @@ patlist = []
 def root():
 	return {"message": "Hello World during the coronavirus pandemic!"}
 
+
 @app.get("/welcome")
-def welcome_to_the_jungle():
-	return {"message": "Welcome to the jungle! We have funny games!"}
+def welcome_to_the_jungle(s_token = Cookie(None)):
+	if s_token in app.tokens:
+		return {"message": "Welcome to the jungle! We have funny games!"}
+	else:
+		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
 
 
 @app.post("/login")
-def login_to_app(response: Response, credentials: HTTPBasicCredentials=Depends(HTTPBasic())):
+def login_to_app(response: Response, credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
 	if credentials.username in app.users and credentials.password == app.users[credentials.username]:
 		s_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret}", encoding='utf8')).hexdigest()
-		app.tokens += s_token
-		response.set_cookie(key="session_token",value=s_token)
+		response.set_cookie(key="session_token", value=s_token)
+		app.tokens.append(s_token)
 		response.status_code = 307
 		response.headers['Location'] = "/welcome"
-		RedirectResponse(url='/welcome')
+		#RedirectResponse(url='/welcome')
+		return response
 	else:
-		raise HTTPException(status_code=401, detail="Niepoprawny login lub haslo")
+		raise HTTPException(status_code=401, detail="Niepoprawny login lub hasło")
+
+
+@app.post("/logout")
+def byebye(response: Response):
+	response.delete_cookie(key="session_token",path="/")
+	RedirectResponse(url='/')
 
 
 @app.get("/num")
