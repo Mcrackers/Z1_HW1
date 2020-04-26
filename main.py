@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 app.num = 0
-app.count = -1
+app.count = 0
 app.users = {"trudnY": "PaC13Nt", "admin": "admin"}
 app.secret = "secret"
 app.tokens = []
@@ -78,10 +78,13 @@ def show_patients(id: int ,s_token = Cookie(None)):
 	return JSONResponse(patlist[id])
 
 @app.delete("/patient/{id}")
-def show_patients(id: int ,s_token = Cookie(None)):
+def show_patients(response: Response, id: int, s_token = Cookie(None)):
 	if s_token not in app.tokens:
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
 	patlist.pop(id)
+	response.status_code = 307
+	response.headers['Location'] = f"/patient"
+	RedirectResponse(url=f'/patient')
 
 @app.get("/num")
 def num():
