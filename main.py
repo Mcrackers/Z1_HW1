@@ -59,20 +59,22 @@ def bye_bye(response: Response):
 	return response
 
 
-@app.post("/patient", status_code=307)
+@app.post("/patient")
 def add_patient(response: Response, name: str, surname: str, session_token: str = Depends(check_stupid_cookie)):
 	if session_token is None:
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
 	app.patient_id +=1
 	app.patient_list[app.patient_id] = {name:surname}
+	response.status_code = 307
 	response.headers['Location'] = f"/patient/{app.patient_id}"
 	return JSONResponse(app.patient_list[app.patient_id])
 
 
 @app.get("/patient")
-def show_patients(session_token: str = Depends(check_stupid_cookie)):
+def show_patients(response: Response, session_token: str = Depends(check_stupid_cookie)):
 	if session_token is None:
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
+	response.status_code = 307
 	return JSONResponse(app.patient_list)
 
 
@@ -83,9 +85,10 @@ def show_patients(id: int, session_token: str = Depends(check_stupid_cookie)):
 	return JSONResponse(app.patient_list[id])
 
 
-@app.delete("/patient/{id}", status_code=307)
+@app.delete("/patient/{id}")
 def show_patients(response: Response, id: int, session_token: str = Depends(check_stupid_cookie)):
 	if session_token is None:
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
 	app.patient_list.pop(id)
-	response.headers['Location'] = f"/patient"
+	response.status_code = 204
+	#response.headers['Location'] = f"/patient"
