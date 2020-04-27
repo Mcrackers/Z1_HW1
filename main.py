@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 
 app = FastAPI()
-app.patient_id = 0
+app.patient_id = -1
 app.users = {"trudnY": "PaC13Nt", "admin": "admin"}
 app.secret = "secret"
 app.tokens = {}
