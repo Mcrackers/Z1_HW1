@@ -59,9 +59,11 @@ def bye_bye(response: Response):
 	response.headers['Location'] = "/"
 	return response
 
+
 class patrq(BaseModel):
 	name: str
 	surname: str
+
 
 @app.post("/patient")
 def add_patient(response: Response, patient: patrq, session_token: str = Depends(check_stupid_cookie)):
@@ -69,16 +71,16 @@ def add_patient(response: Response, patient: patrq, session_token: str = Depends
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
 	app.patient_id +=1
 	app.patient_list[app.patient_id] = patient.dict()
-	response.status_code = 307
+	response.status_code = 302
 	response.headers['Location'] = f"/patient/{app.patient_id}"
-	return JSONResponse(app.patient_list[app.patient_id])
+	#return JSONResponse(app.patient_list[app.patient_id])
 
 
 @app.get("/patient")
 def show_patients(response: Response, session_token: str = Depends(check_stupid_cookie)):
 	if session_token is None:
 		raise HTTPException(status_code=401, detail="dostęp wzbroniony")
-	response.status_code = 307
+	response.status_code = 302
 	return JSONResponse(app.patient_list)
 
 
